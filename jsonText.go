@@ -3,11 +3,11 @@ package jsonText
 type TextString string
 
 type TextTemplate struct {
-	top         TextString
-	topSplit    TextString
-	middle      TextString
-	bottomSplit TextString
-	bottom      TextString
+	Top         TextString
+	TopSplit    TextString
+	Middle      TextString
+	BottomSplit TextString
+	Bottom      TextString
 }
 
 type IText interface {
@@ -80,7 +80,7 @@ func (txt TextString) AddSubLines(lines ...string) {
 // Функции интерфейса iTextString для типа TextTemplate
 //
 func (j TextTemplate) Get() string {
-	return string(j.top + j.topSplit + j.middle + j.bottomSplit + j.bottom)
+	return string(j.Top + j.TopSplit + j.Middle + j.BottomSplit + j.Bottom)
 }
 
 // Задает значения текстовых блоков в следующем порядке: верхний, нижний, средние
@@ -90,14 +90,14 @@ func (txt TextTemplate) Set(lines ...string) {
 		switch i {
 		case 0:
 			if v != "" {
-				txt.top.Set(v)
+				txt.Top.Set(v)
 			}
 		case 1:
-			txt.bottom.Set(v)
+			txt.Bottom.Set(v)
 		case 2:
-			txt.middle.Set(v)
+			txt.Middle.Set(v)
 		default:
-			txt.middle.AddUpLines(v)
+			txt.Middle.AddUpLines(v)
 		}
 	}
 	return
@@ -105,41 +105,41 @@ func (txt TextTemplate) Set(lines ...string) {
 
 func (txt TextTemplate) SetSplit(topSplit string, bottomSplit string) {
 	if topSplit != "" {
-		txt.topSplit.Set("\n" + topSplit + "\n")
+		txt.TopSplit.Set("\n" + topSplit + "\n")
 	} else {
-		txt.topSplit.Set("\n===\n")
+		txt.TopSplit.Set("\n===\n")
 	}
 	if bottomSplit != "" {
-		txt.bottomSplit.Set("\n" + bottomSplit + "\n")
+		txt.BottomSplit.Set("\n" + bottomSplit + "\n")
 	} else {
-		txt.bottomSplit.Set("\n===\n")
+		txt.BottomSplit.Set("\n===\n")
 	}
 	return
 }
 
 func (txt TextTemplate) Clean() {
-	txt.bottom.Clean()
-	txt.middle.Clean()
-	txt.top.Clean()
+	txt.Bottom.Clean()
+	txt.Middle.Clean()
+	txt.Top.Clean()
 	txt.SetSplit("", "")
 
 	return
 }
 
 func (txt TextTemplate) Add(line string) {
-	txt.middle.Add(line)
+	txt.Middle.Add(line)
 	return
 }
 
 func (txt TextTemplate) AddUpLines(lines ...string) {
 	for _, v := range lines {
-		txt.top.AddSubLines(v)
+		txt.Top.AddSubLines(v)
 	}
 	return
 }
 
 func (txt TextTemplate) AddSubLines(lines ...string) {
 	for _, v := range lines {
-		txt.bottom.AddSubLines(v)
+		txt.Bottom.AddSubLines(v)
 	}
 }
