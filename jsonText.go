@@ -1,4 +1,4 @@
-package JSONText
+package jsonText
 
 // Public visibility
 var Test2 = "public variable"
