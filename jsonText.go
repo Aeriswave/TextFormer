@@ -17,7 +17,7 @@ type ITextString interface {
 	Get() string
 	Set(string)
 	AddUpperLine(string)
-	AddDownerLine(string)
+	AddLowerLine(string)
 	AddLeft(string)
 	AddRight(string)
 	Clean()
@@ -56,7 +56,7 @@ func (txt TextString) AddUpperLines(lines ...string) (err error) {
 	return nil
 }
 
-func (txt TextString) AddDownerLines(lines ...string) (err error) {
+func (txt TextString) AddLowerLines(lines ...string) (err error) {
 	t := ""
 	for _, v := range lines {
 		if v != "" {
@@ -103,18 +103,18 @@ func (txt TextTemplate) Clean() (err error) {
 	return nil
 }
 
-func (txt TextTemplate) AddUpLines(lines ...string) (err error) {
+func (txt TextTemplate) AddUpperLines(lines ...string) (err error) {
 	var t TextString = ""
 	for _, v := range lines {
 		t.AddUpperLines(v)
 	}
 	if t != "" {
-		txt.AddDownLines(string(t))
+		txt.AddLowerLines(string(t))
 	}
 	return nil
 }
 
-func (txt TextTemplate) AddDownLines(lines ...string) (err error) {
+func (txt TextTemplate) AddLowerLines(lines ...string) (err error) {
 	var t TextString = ""
 	for _, v := range lines {
 		t.AddUpperLines(v)
