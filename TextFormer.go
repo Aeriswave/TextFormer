@@ -1,10 +1,6 @@
 package TextFormer // строка для подключения в качестве pkg, для автономного запуска строку нужно закоментировать
 // package main // строка для автономного запуска, для подключения в качестве pkg строку нужно закоментировать
 
-import (
-	"fmt"
-)
-
 type TextString string
 
 type TextTemplate struct {
@@ -26,6 +22,7 @@ type IText interface {
 	Clean()
 }
 
+/*
 func Main() {
 	var tmp TextString = ""
 	var nn TextTemplate = TextTemplate{
@@ -50,6 +47,7 @@ func Main() {
 	fmt.Printf(string(tt.Get())) // Для вывода итогового текста в консоль
 	return
 }
+*/
 
 // Функции интерфейса IText для типа TextString
 //
