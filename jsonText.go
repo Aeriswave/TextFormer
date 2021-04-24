@@ -13,6 +13,7 @@ type TextTemplate struct {
 type IText interface {
 	Get() string
 	Set(...string)
+	Add(string)
 	SetSplit(string, string)
 	AddUpLines(...string)
 	AddSubLines(...string)
@@ -45,6 +46,13 @@ func (txt TextString) Clean() {
 	return
 }
 
+func (txt TextString) Add(line string) {
+	if line != "" {
+		txt = TextString(line) + "\n" + txt
+	}
+	return
+}
+
 func (txt TextString) AddUpLines(lines ...string) {
 	t := ""
 	for _, v := range lines {
@@ -52,9 +60,7 @@ func (txt TextString) AddUpLines(lines ...string) {
 			t += v + "\n"
 		}
 	}
-	if t != "" {
-		txt = TextString(t) + "\n" + txt
-	}
+	txt.Add(t)
 	return
 }
 
@@ -120,10 +126,15 @@ func (txt TextTemplate) Clean() {
 	return
 }
 
+func (txt TextTemplate) Add(line string) {
+	txt.middle.Add(line)
+	return
+}
+
 func (txt TextTemplate) AddUpLines(lines ...string) {
 	var t TextString = ""
 	for _, v := range lines {
-		t.AddUpLines(v)
+		t.Add(v)
 	}
 	if t != "" {
 		txt.AddSubLines(string(t))
@@ -134,7 +145,7 @@ func (txt TextTemplate) AddUpLines(lines ...string) {
 func (txt TextTemplate) AddSubLines(lines ...string) {
 	var t TextString = ""
 	for _, v := range lines {
-		t.AddUpLines(v)
+		t.Add(v)
 	}
 	if t != "" {
 		txt.bottom.AddSubLines(string(t))
