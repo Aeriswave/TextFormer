@@ -76,9 +76,15 @@ func (j TextTemplate) Get() string {
 }
 
 func (txt TextTemplate) Set(topic string, middleText string, endText string) (err error) {
-	txt.top.Set(topic)
-	txt.middle.Set(middleText)
-	txt.bottom.Set(endText)
+	if topic != "" {
+		txt.top.Set(topic)
+	}
+	if middleText != "" {
+		txt.middle.Set(middleText)
+	}
+	if endText != "" {
+		txt.bottom.Set(endText)
+	}
 	return nil
 }
 
