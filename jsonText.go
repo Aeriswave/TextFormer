@@ -32,7 +32,7 @@ func Main() {
 // Функции интерфейса iTextString для типа TextString
 //
 func (j TextString) Get() string {
-	return j.Get()
+	return string(j)
 }
 
 func (txt TextString) Set(lines ...string) {
@@ -42,7 +42,7 @@ func (txt TextString) Set(lines ...string) {
 }
 
 func (txt TextString) Clean() {
-	txt += ""
+	txt = ""
 	return
 }
 
@@ -54,13 +54,9 @@ func (txt TextString) Add(line string) {
 }
 
 func (txt TextString) AddUpLines(lines ...string) {
-	t := ""
 	for _, v := range lines {
-		if v != "" {
-			t += v + "\n"
-		}
+		txt.Add(v)
 	}
-	txt.Add(t)
 	return
 }
 
