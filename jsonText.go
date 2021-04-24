@@ -1,5 +1,9 @@
 package jsonText
 
+import (
+	"fmt"
+)
+
 type TextString string
 
 type TextTemplate struct {
@@ -32,12 +36,18 @@ func Main() {
 // Функции интерфейса iTextString для типа TextString
 //
 func (j TextString) Get() string {
+	fmt.Printf("Start Get\n")
 	return string(j)
 }
 
 func (txt TextString) Set(lines ...string) {
+	fmt.Printf("Start set\n")
+
 	txt.Clean()
 	txt.AddUpLines(lines...)
+
+	fmt.Printf("End set\n")
+
 	return
 }
 
@@ -47,9 +57,13 @@ func (txt TextString) Clean() {
 }
 
 func (txt TextString) Add(line string) {
+	fmt.Printf("Start Add\n")
+
 	if line != "" {
 		txt = TextString(line) + "\n" + txt
 	}
+
+	fmt.Printf("End Add\n")
 	return
 }
 
@@ -81,19 +95,19 @@ func (j TextTemplate) Get() string {
 
 // Задает значения текстовых блоков в следующем порядке: верхний, нижний, средние
 func (txt TextTemplate) Set(lines ...string) {
-	//	txt.sss
+	fmt.Print("dds")
 	for i, v := range lines {
-		switch i {
-		case 0:
-			if v != "" {
+		if v != "" {
+			switch i {
+			case 0:
 				txt.Top.Set(v)
+			case 1:
+				txt.Bottom.Set(v)
+			case 2:
+				txt.Middle.Set(v)
+			default:
+				txt.Middle.AddUpLines(v)
 			}
-		case 1:
-			txt.Bottom.Set(v)
-		case 2:
-			txt.Middle.Set(v)
-		default:
-			txt.Middle.AddUpLines(v)
 		}
 	}
 	return
