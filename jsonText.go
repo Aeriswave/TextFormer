@@ -132,23 +132,14 @@ func (txt TextTemplate) Add(line string) {
 }
 
 func (txt TextTemplate) AddUpLines(lines ...string) {
-	var t TextString = ""
 	for _, v := range lines {
-		t.Add(v)
-	}
-	if t != "" {
-		txt.AddSubLines(string(t))
+		txt.top.AddSubLines(v)
 	}
 	return
 }
 
 func (txt TextTemplate) AddSubLines(lines ...string) {
-	var t TextString = ""
 	for _, v := range lines {
-		t.Add(v)
+		txt.bottom.AddSubLines(v)
 	}
-	if t != "" {
-		txt.bottom.AddSubLines(string(t))
-	}
-	return
 }
