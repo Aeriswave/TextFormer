@@ -16,8 +16,8 @@ type TextTemplate struct {
 type ITextString interface {
 	Get() string
 	Set(string)
-	AddUpperLine(string)
-	AddLowerLine(string)
+	AddLinesUp(string)
+	AddLinesDown(string)
 	AddLeft(string)
 	AddRight(string)
 	Clean()
@@ -43,7 +43,7 @@ func (txt TextString) Clean() (err error) {
 	return nil
 }
 
-func (txt TextString) AddUpperLines(lines ...string) (err error) {
+func (txt TextString) AddLinesUp(lines ...string) (err error) {
 	t := ""
 	for _, v := range lines {
 		if v != "" {
@@ -56,7 +56,7 @@ func (txt TextString) AddUpperLines(lines ...string) (err error) {
 	return nil
 }
 
-func (txt TextString) AddLowerLines(lines ...string) (err error) {
+func (txt TextString) AddLinesDown(lines ...string) (err error) {
 	t := ""
 	for _, v := range lines {
 		if v != "" {
@@ -112,21 +112,21 @@ func (txt TextTemplate) Clean() (err error) {
 func (txt TextTemplate) AddUpperLines(lines ...string) (err error) {
 	var t TextString = ""
 	for _, v := range lines {
-		t.AddUpperLines(v)
+		t.AddLinesUp(v)
 	}
 	if t != "" {
-		txt.AddLowerLines(string(t))
+		txt.AddLinesDown(string(t))
 	}
 	return nil
 }
 
-func (txt TextTemplate) AddLowerLines(lines ...string) (err error) {
+func (txt TextTemplate) AddLinesDown(lines ...string) (err error) {
 	var t TextString = ""
 	for _, v := range lines {
-		t.AddUpperLines(v)
+		t.AddLinesUp(v)
 	}
 	if t != "" {
-		txt.bottom.AddUpperLines(string(t))
+		txt.bottom.AddLinesDown(string(t))
 	}
 	return nil
 }
