@@ -1,5 +1,5 @@
 package TextFormer // строка для подключения в качестве pkg, для автономного запуска строку нужно закоментировать
-//package main // строка для автономного запуска, для подключения в качестве pkg строку нужно закоментировать
+// package main // строка для автономного запуска, для подключения в качестве pkg строку нужно закоментировать
 
 import (
 	"fmt"
@@ -26,7 +26,7 @@ type IText interface {
 	Clean()
 }
 
-func main() {
+func Main() {
 	var tmp TextString = ""
 	var nn TextTemplate = TextTemplate{
 		Top:         tmp,
