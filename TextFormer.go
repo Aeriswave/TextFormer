@@ -26,7 +26,7 @@ type IText interface {
 	Clean()
 }
 
-func main() {
+func Main() {
 	var tmp TextString = ""
 	var nn TextTemplate = TextTemplate{
 		Top:         tmp,
