@@ -1,4 +1,4 @@
-package jsonText
+package main
 
 import (
 	"fmt"
@@ -17,85 +17,107 @@ type TextTemplate struct {
 type IText interface {
 	Get() string
 	Set(...string)
-	Add(string)
+	AddUD(...string)
+	AddDU(...string)
 	SetSplit(string, string)
-	AddUpLines(...string)
-	AddSubLines(...string)
+	AddTopUD(...string)
+	AddBottomUD(...string)
 	//	AddLeft(string)
 	//	AddRight(string)
 	Clean()
 }
 
-func Main() {
-	var nn TextTemplate
-	var tt IText = nn
+func main() {
+	var tmp TextString = ""
+	var nn TextTemplate = TextTemplate{
+		Top:         tmp,
+		TopSplit:    tmp,
+		Middle:      tmp,
+		BottomSplit: tmp,
+		Bottom:      tmp}
+
+	var tt IText
+	tt = &nn
 	tt.Set("Верх", "Низ", "Середина")
+	tt.AddTopUD("Заголовки", "заголовочки")
+	tt.AddBottomUD("нижние строки", "последние строчечки")
+	tt.AddDU("текст1 порядок чтения снизу вверх")
+	tt.AddDU("текст2 для логов, блогов")
+	tt.AddDU("текст3 и для устаревающей информации")
+	tt.AddUD("txt1 для чтения сверху вниз")
+	tt.AddUD("txt2 для чтения по порядку")
+	tt.AddUD("txt3 как в книгах")
+	tt.SetSplit("~~~", "~~~")
+	fmt.Printf(string(tt.Get()))
 	return
 }
 
-// Функции интерфейса iTextString для типа TextString
+// Функции интерфейса IText для типа TextString
 //
-func (j TextString) Get() string {
-	fmt.Printf("Start Get\n")
-	return string(j)
+func (j *TextString) Get() string {
+	return string(*j)
 }
 
-func (txt TextString) Set(lines ...string) {
-	fmt.Printf("Start set\n")
-
+func (txt *TextString) Set(lines ...string) {
 	txt.Clean()
-	txt.AddUpLines(lines...)
-
-	fmt.Printf("End set\n")
-
+	txt.AddTopUD(lines...)
 	return
 }
 
-func (txt TextString) Clean() {
-	txt = ""
+func (txt *TextString) Clean() {
+	*txt = ""
 	return
 }
 
-func (txt TextString) Add(line string) {
-	fmt.Printf("Start Add\n")
-
+func (txt *TextString) AddDU(line string) {
 	if line != "" {
-		txt = TextString(line) + "\n" + txt
+		*txt = TextString(line + "\n" + txt.Get())
 	}
-
-	fmt.Printf("End Add\n")
 	return
 }
 
-func (txt TextString) AddUpLines(lines ...string) {
+func (txt *TextString) AddUD(line string) {
+	if line != "" {
+		*txt += TextString(line + "\n")
+	}
+	return
+}
+
+func (txt *TextString) AddTopUD(lines ...string) {
 	for _, v := range lines {
-		txt.Add(v)
+		txt.AddUD(v)
 	}
 	return
 }
 
-func (txt TextString) AddSubLines(lines ...string) {
+func (txt *TextString) AddBottomUD(lines ...string) {
 	t := ""
 	for _, v := range lines {
 		if v != "" {
-			if v != "" {
-				t += v + "\n"
-			}
+			t += v + "\n"
 		}
 	}
-	txt += "\n" + TextString(t)
+	*txt += TextString(t)
 	return
 }
 
-// Функции интерфейса iTextString для типа TextTemplate
+// Функции интерфейса IText для типа TextTemplate
 //
-func (j TextTemplate) Get() string {
-	return string(j.Top + j.TopSplit + j.Middle + j.BottomSplit + j.Bottom)
+func (j *TextTemplate) Get() string {
+	//	var t string
+	if (j.TopSplit != "") && (j.BottomSplit != "") {
+		return string(j.Top + j.TopSplit + j.Middle + j.BottomSplit + j.Bottom)
+	}
+	if j.TopSplit != "" {
+		return string(j.Top + j.TopSplit + j.Middle + j.Bottom)
+
+	}
+	return string(j.Top + j.Middle + j.Bottom)
 }
 
 // Задает значения текстовых блоков в следующем порядке: верхний, нижний, средние
-func (txt TextTemplate) Set(lines ...string) {
-	fmt.Print("dds")
+func (txt *TextTemplate) Set(lines ...string) {
+	txt.Clean()
 	for i, v := range lines {
 		if v != "" {
 			switch i {
@@ -106,28 +128,28 @@ func (txt TextTemplate) Set(lines ...string) {
 			case 2:
 				txt.Middle.Set(v)
 			default:
-				txt.Middle.AddUpLines(v)
+				txt.Middle.AddTopUD(v)
 			}
 		}
 	}
 	return
 }
 
-func (txt TextTemplate) SetSplit(topSplit string, bottomSplit string) {
+func (txt *TextTemplate) SetSplit(topSplit string, bottomSplit string) {
 	if topSplit != "" {
-		txt.TopSplit.Set("\n" + topSplit + "\n")
+		txt.TopSplit.Set(topSplit)
 	} else {
-		txt.TopSplit.Set("\n===\n")
+		txt.TopSplit.Set("")
 	}
 	if bottomSplit != "" {
-		txt.BottomSplit.Set("\n" + bottomSplit + "\n")
+		txt.BottomSplit.Set(bottomSplit)
 	} else {
-		txt.BottomSplit.Set("\n===\n")
+		txt.BottomSplit.Set("")
 	}
 	return
 }
 
-func (txt TextTemplate) Clean() {
+func (txt *TextTemplate) Clean() {
 	txt.Bottom.Clean()
 	txt.Middle.Clean()
 	txt.Top.Clean()
@@ -136,20 +158,29 @@ func (txt TextTemplate) Clean() {
 	return
 }
 
-func (txt TextTemplate) Add(line string) {
-	txt.Middle.Add(line)
-	return
-}
-
-func (txt TextTemplate) AddUpLines(lines ...string) {
+func (txt *TextTemplate) AddUD(lines ...string) {
 	for _, v := range lines {
-		txt.Top.AddSubLines(v)
+		txt.Middle.AddUD(v)
 	}
 	return
 }
 
-func (txt TextTemplate) AddSubLines(lines ...string) {
+func (txt *TextTemplate) AddDU(lines ...string) {
 	for _, v := range lines {
-		txt.Bottom.AddSubLines(v)
+		txt.Middle.AddDU(v)
+	}
+	return
+}
+
+func (txt *TextTemplate) AddTopUD(lines ...string) {
+	for _, v := range lines {
+		txt.Top.AddBottomUD(v)
+	}
+	return
+}
+
+func (txt *TextTemplate) AddBottomUD(lines ...string) {
+	for _, v := range lines {
+		txt.Bottom.AddBottomUD(v)
 	}
 }
