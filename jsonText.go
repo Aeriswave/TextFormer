@@ -13,7 +13,7 @@ type TextTemplate struct {
 	bottom     TextString
 }
 
-type iTextString interface {
+type ITextString interface {
 	Get() string
 	Set(string)
 	AddUpLine(string)
