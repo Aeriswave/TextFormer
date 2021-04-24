@@ -14,7 +14,7 @@ type TextTemplate struct {
 }
 
 type iTextString interface {
-	Get() ([]byte, error)
+	Get() string
 	Set(string)
 	AddUpLine(string)
 	AddDownLine(string)
