@@ -46,7 +46,7 @@ func main() {
 	tt.AddUD("txt2 для чтения по порядку")
 	tt.AddUD("txt3 как в книгах")
 	tt.SetSplit("~~~", "~~~")
-	fmt.Printf(string(tt.Get()))
+	fmt.Printf(string(tt.Get())) // Для вывода итогового текста в консоль
 	return
 }
 
