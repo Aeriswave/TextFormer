@@ -1,5 +1,4 @@
-package main // строка для подключения в качестве pkg, для автономного запуска строку нужно закоментировать
-// package main // строка для автономного запуска, для подключения в качестве pkg строку нужно закоментировать
+package main
 
 type TextString string
 
@@ -58,6 +57,16 @@ func (j *TextString) Get() string {
 func (txt *TextString) Set(lines ...string) {
 	txt.Clean()
 	txt.AddTopUD(lines...)
+	return
+}
+
+func (txt *TextString) SetSplit(topSplit string, bottomSplit string) {
+	if topSplit != "" {
+		txt.AddDU(topSplit)
+	}
+	if bottomSplit != "" {
+		txt.AddUD(bottomSplit)
+	}
 	return
 }
 
