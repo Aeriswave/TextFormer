@@ -2,8 +2,10 @@
 ## Ветвь (PKG branch) для подключения в качестве PKG   
 Программа для добавления в текст новых блоков   
 ``` go
+type TextString string      // простой текстовый блок   
 // Структура текстовых блоков:   
-> type TextTemplate struct  // текстовый блок   
+> type TextTemplate struct  // текстовый блок с разметкой   
+> {  
 > {  
 >	  Top         TextString // верхняя часть   
 >	  TopSplit    TextString // разделитель   
