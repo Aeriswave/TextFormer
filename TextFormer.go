@@ -68,16 +68,20 @@ func (txt *TextString) Clean() {
 	return
 }
 
-func (txt *TextString) AddDU(line string) {
-	if line != "" {
-		*txt = TextString(line + "\n" + txt.Get())
+func (txt *TextString) AddDU(lines ...string) {
+	for _, v := range lines {
+		if v != "" {
+			*txt = TextString(v + "\n" + txt.Get())
+		}
 	}
 	return
 }
 
-func (txt *TextString) AddUD(line string) {
-	if line != "" {
-		*txt += TextString(line + "\n")
+func (txt *TextString) AddUD(lines ...string) {
+	for _, v := range lines {
+		if v != "" {
+			*txt += TextString(v + "\n")
+		}
 	}
 	return
 }
