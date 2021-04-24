@@ -1,49 +1,51 @@
 package jsonText
 
-// Public visibility
-var Test2 = "public variable"
-
 type TextString string
 
 type TextTemplate struct {
-	top        TextString
-	topLine    TextString
-	middle     TextString
-	bottomLine TextString
-	bottom     TextString
+	top         TextString
+	topSplit    TextString
+	middle      TextString
+	bottomSplit TextString
+	bottom      TextString
 }
 
-type ITextString interface {
+type IText interface {
 	Get() string
-	Set(string)
-	AddLinesUp(string)
-	AddLinesDown(string)
-	AddLeft(string)
-	AddRight(string)
+	Set(...string)
+	SetSplit(string, string)
+	AddUpLines(...string)
+	AddSubLines(...string)
+	//	AddLeft(string)
+	//	AddRight(string)
 	Clean()
 }
 
 func Main() {
+	var nn TextTemplate
+	var tt IText = nn
+	tt.Set("Верх", "Низ", "Середина")
 	return
 }
 
 // Функции интерфейса iTextString для типа TextString
 //
 func (j TextString) Get() string {
-	return string(j)
+	return j.Get()
 }
 
-func (txt TextString) Set(line string) (err error) {
-	txt = TextString(line)
-	return nil
+func (txt TextString) Set(lines ...string) {
+	txt.Clean()
+	txt.AddUpLines(lines...)
+	return
 }
 
-func (txt TextString) Clean() (err error) {
+func (txt TextString) Clean() {
 	txt += ""
-	return nil
+	return
 }
 
-func (txt TextString) AddLinesUp(lines ...string) (err error) {
+func (txt TextString) AddUpLines(lines ...string) {
 	t := ""
 	for _, v := range lines {
 		if v != "" {
@@ -53,10 +55,10 @@ func (txt TextString) AddLinesUp(lines ...string) (err error) {
 	if t != "" {
 		txt = TextString(t) + "\n" + txt
 	}
-	return nil
+	return
 }
 
-func (txt TextString) AddLinesDown(lines ...string) (err error) {
+func (txt TextString) AddSubLines(lines ...string) {
 	t := ""
 	for _, v := range lines {
 		if v != "" {
@@ -66,67 +68,76 @@ func (txt TextString) AddLinesDown(lines ...string) (err error) {
 		}
 	}
 	txt += "\n" + TextString(t)
-	return nil
+	return
 }
 
 // Функции интерфейса iTextString для типа TextTemplate
 //
 func (j TextTemplate) Get() string {
-	return string(j.top + j.topLine + j.middle + j.bottomLine + j.bottom)
+	return string(j.top + j.topSplit + j.middle + j.bottomSplit + j.bottom)
 }
 
-func (txt TextTemplate) Set(topic string, middleText string, endText string) (err error) {
-	if topic != "" {
-		txt.top.Set(topic)
+// Задает значения текстовых блоков в следующем порядке: верхний, нижний, средние
+func (txt TextTemplate) Set(lines ...string) {
+	//	txt.sss
+	for i, v := range lines {
+		switch i {
+		case 0:
+			if v != "" {
+				txt.top.Set(v)
+			}
+		case 1:
+			txt.bottom.Set(v)
+		case 2:
+			txt.middle.Set(v)
+		default:
+			txt.middle.AddUpLines(v)
+		}
 	}
-	if middleText != "" {
-		txt.middle.Set(middleText)
-	}
-	if endText != "" {
-		txt.bottom.Set(endText)
-	}
-	return nil
+	return
 }
 
-func (txt TextTemplate) SetLine(topLine string, bottomLine string) (err error) {
-	if topLine != "" {
-		txt.topLine.Set("\n" + topLine + "\n")
+func (txt TextTemplate) SetSplit(topSplit string, bottomSplit string) {
+	if topSplit != "" {
+		txt.topSplit.Set("\n" + topSplit + "\n")
 	} else {
-		txt.topLine.Set("\n===\n")
+		txt.topSplit.Set("\n===\n")
 	}
-	if bottomLine != "" {
-		txt.bottomLine.Set("\n" + bottomLine + "\n")
+	if bottomSplit != "" {
+		txt.bottomSplit.Set("\n" + bottomSplit + "\n")
 	} else {
-		txt.bottomLine.Set("\n===\n")
+		txt.bottomSplit.Set("\n===\n")
 	}
-	return nil
+	return
 }
 
-func (txt TextTemplate) Clean() (err error) {
+func (txt TextTemplate) Clean() {
 	txt.bottom.Clean()
 	txt.middle.Clean()
 	txt.top.Clean()
-	return nil
+	txt.SetSplit("", "")
+
+	return
 }
 
-func (txt TextTemplate) AddUpperLines(lines ...string) (err error) {
+func (txt TextTemplate) AddUpLines(lines ...string) {
 	var t TextString = ""
 	for _, v := range lines {
-		t.AddLinesUp(v)
+		t.AddUpLines(v)
 	}
 	if t != "" {
-		txt.AddLinesDown(string(t))
+		txt.AddSubLines(string(t))
 	}
-	return nil
+	return
 }
 
-func (txt TextTemplate) AddLinesDown(lines ...string) (err error) {
+func (txt TextTemplate) AddSubLines(lines ...string) {
 	var t TextString = ""
 	for _, v := range lines {
-		t.AddLinesUp(v)
+		t.AddUpLines(v)
 	}
 	if t != "" {
-		txt.bottom.AddLinesDown(string(t))
+		txt.bottom.AddSubLines(string(t))
 	}
-	return nil
+	return
 }
