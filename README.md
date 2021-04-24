@@ -14,7 +14,7 @@ type TextString string      // простой текстовый блок
 >	  Bottom      TextString // нижняя часть   
 >}   
 >   
-// API для работы с текстовыми блоками   
+// API для работы с текстовыми блоками TextString и TextTemplate    
 >type IText interface   
 >{   
 >	  Get() string // получить блок текст   
