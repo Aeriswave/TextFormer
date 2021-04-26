@@ -1,5 +1,9 @@
 package main
 
+import (
+	"fmt"
+)
+
 type TextString string
 
 type TextTemplate struct {
@@ -21,8 +25,7 @@ type IText interface {
 	Clean()
 }
 
-/*
-func Main() {
+func main() {
 	var tmp TextString = ""
 	var nn TextTemplate = TextTemplate{
 		Top:         tmp,
@@ -33,6 +36,9 @@ func Main() {
 
 	var tt IText
 	tt = &nn
+	var ts IText
+	ts = &tmp
+	ts.SetSplit("", "")
 	tt.Set("Верх", "Низ", "Текст посередке")
 	tt.AddTopUD("Заголовки", "подзаголовки")
 	tt.AddBottomUD("нижние строки страницы", "последние строчечки")
@@ -46,7 +52,6 @@ func Main() {
 	fmt.Printf(string(tt.Get())) // Для вывода итогового текста в консоль
 	return
 }
-*/
 
 // Функции интерфейса IText для типа TextString
 //
