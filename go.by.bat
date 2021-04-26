@@ -7,7 +7,7 @@ pause
 go run do.go run.go run.in.go run.of.go
 echo End
 pause
-exit
+::exit
 
 :: в консоли Git можно запускать так
 :: go run do.go run*.go
