@@ -1,30 +1,7 @@
 package main
 
-import (
-	"fmt"
-)
-
-type TextString string
-
-type TextTemplate struct {
-	Top         TextString
-	TopSplit    TextString
-	Middle      TextString
-	BottomSplit TextString
-	Bottom      TextString
-}
-
-type IText interface {
-	Get() string
-	Set(...string)
-	AddUD(...string)
-	AddDU(...string)
-	SetSplit(string, string)
-	AddTopUD(...string)
-	AddBottomUD(...string)
-	Clean()
-}
-
+/*
+import ("fmt")
 func main() {
 	var tmp TextString = ""
 	var nn TextTemplate = TextTemplate{
@@ -51,6 +28,28 @@ func main() {
 	tt.SetSplit("~~Строка разделителя верхних заголовков и текста~~", "~~Строка разделителя текста и нижних строк страницы ~~")
 	fmt.Printf(string(tt.Get())) // Для вывода итогового текста в консоль
 	return
+}
+*/
+
+type TextString string
+
+type TextTemplate struct {
+	Top         TextString
+	TopSplit    TextString
+	Middle      TextString
+	BottomSplit TextString
+	Bottom      TextString
+}
+
+type IText interface {
+	Get() string
+	Set(...string)
+	AddUD(...string)
+	AddDU(...string)
+	SetSplit(string, string)
+	AddTopUD(...string)
+	AddBottomUD(...string)
+	Clean()
 }
 
 // Функции интерфейса IText для типа TextString
