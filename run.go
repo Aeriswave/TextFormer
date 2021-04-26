@@ -1,23 +1,24 @@
 package main
 
-// Функции интерфейса IText для типа TextString
+// Функции интерфейса IText
 //
+
 func (j *StrText) Get() string {
 	return string(*j)
 }
 
 func (txt *StrText) Set(lines ...string) {
 	txt.Clean()
-	txt.AddTopUD(lines...)
+	txt.AddFall(lines...)
 	return
 }
 
-func (txt *StrText) SetSplit(topSplit string, bottomSplit string) {
-	if topSplit != "" {
-		txt.AddDU(topSplit)
+func (txt *StrText) Split(vSplit string, nSplit string) {
+	if vSplit != "" {
+		txt.AddFall(vSplit, txt.Get())
 	}
-	if bottomSplit != "" {
-		txt.AddUD(bottomSplit)
+	if nSplit != "" {
+		txt.AddRise(txt.Get(), nSplit)
 	}
 	return
 }
@@ -27,7 +28,7 @@ func (txt *StrText) Clean() {
 	return
 }
 
-func (txt *StrText) AddDU(lines ...string) {
+func (txt *StrText) AddRise(lines ...string) {
 	for _, v := range lines {
 		if v != "" {
 			*txt = StrText(v + "\n" + txt.Get())
@@ -36,7 +37,7 @@ func (txt *StrText) AddDU(lines ...string) {
 	return
 }
 
-func (txt *StrText) AddUD(lines ...string) {
+func (txt *StrText) AddFall(lines ...string) {
 	for _, v := range lines {
 		if v != "" {
 			*txt += StrText(v + "\n")
@@ -45,14 +46,14 @@ func (txt *StrText) AddUD(lines ...string) {
 	return
 }
 
-func (txt *StrText) AddTopUD(lines ...string) {
+func (txt *StrText) TopAddFall(lines ...string) {
 	for _, v := range lines {
-		txt.AddUD(v)
+		txt.AddFall(v)
 	}
 	return
 }
 
-func (txt *StrText) AddBottomUD(lines ...string) {
+func (txt *StrText) SubAddFall(lines ...string) {
 	t := ""
 	for _, v := range lines {
 		if v != "" {
@@ -63,10 +64,10 @@ func (txt *StrText) AddBottomUD(lines ...string) {
 	return
 }
 
-// Функции интерфейса IText для типа TextTemplate
+// Функции интерфейса
 //
 func (j *StrBlock) Get() string {
-	return j.Top.Get() + j.TopSplit.Get() + j.Mid[0].Get() + j.NizSplit.Get() + j.Niz.Get()
+	return j.Top.Get() + j.TopSplit.Get() + j.Mid.Get() + j.SubSplit.Get() + j.Sub.Get()
 }
 
 // Задает значения текстовых блоков в следующем порядке: верхний, нижний, средние
@@ -78,63 +79,71 @@ func (txt *StrBlock) Set(lines ...string) {
 			case 0:
 				txt.Top.Set(v)
 			case 1:
-				txt.Niz.Set(v)
+				txt.Sub.Set(v)
 			case 2:
-				txt.Mid[0].Set(v)
+				txt.Mid.Set(v)
 			default:
-				txt.Mid[0].AddTopUD(v)
+				txt.Mid.TopAddFall(v)
 			}
 		}
 	}
 	return
 }
 
-func (txt *StrBlock) SetSplit(topSplit string, bottomSplit string) {
+func (txt *StrBlock) Split(topSplit string, bottomSplit string) {
 	if topSplit != "" {
 		txt.TopSplit.Set(topSplit)
 	} else {
 		txt.TopSplit.Set("")
 	}
 	if bottomSplit != "" {
-		txt.NizSplit.Set(bottomSplit)
+		txt.SubSplit.Set(bottomSplit)
 	} else {
-		txt.NizSplit.Set("")
+		txt.SubSplit.Set("")
 	}
 	return
 }
 
 func (txt *StrBlock) Clean() {
-	txt.Niz.Clean()
-	txt.Mid[0].Clean()
+	var tmp []StrText = []StrText{"", "", "", "", "", ""}
+	var itmp []IText = []IText{&tmp[0], &tmp[1], &tmp[2], &tmp[3], &tmp[4]}
+	txt.Top = itmp[0]
+	txt.TopSplit = itmp[1]
+	txt.Mid = itmp[2]
+	txt.SubSplit = itmp[3]
+	txt.Sub = itmp[4]
+
+	txt.Sub.Clean()
+	txt.Mid.Clean()
 	txt.Top.Clean()
-	txt.SetSplit("", "")
+	txt.Split("", "")
 
 	return
 }
 
-func (txt *StrBlock) AddUD(lines ...string) {
+func (txt *StrBlock) AddFall(lines ...string) {
 	for _, v := range lines {
-		txt.Mid[0].AddUD(v)
+		txt.Mid.AddFall(v)
 	}
 	return
 }
 
-func (txt *StrBlock) AddDU(lines ...string) {
+func (txt *StrBlock) AddRise(lines ...string) {
 	for _, v := range lines {
-		txt.Mid[0].AddDU(v)
+		txt.Mid.AddRise(v)
 	}
 	return
 }
 
-func (txt *StrBlock) AddTopUD(lines ...string) {
+func (txt *StrBlock) TopAddFall(lines ...string) {
 	for _, v := range lines {
-		txt.Top.AddBottomUD(v)
+		txt.Top.SubAddFall(v)
 	}
 	return
 }
 
-func (txt *StrBlock) AddBottomUD(lines ...string) {
+func (txt *StrBlock) SubAddFall(lines ...string) {
 	for _, v := range lines {
-		txt.Niz.AddBottomUD(v)
+		txt.Sub.SubAddFall(v)
 	}
 }

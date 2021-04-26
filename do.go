@@ -6,31 +6,28 @@ import (
 )
 
 func main() {
-	var tmp StrText = ""
-	var mid StrArray = StrArray{tmp}
-	mid[0] = ""
 	var nn StrBlock = StrBlock{
-		Top:      tmp,
-		TopSplit: tmp,
-		Mid:      mid,
-		NizSplit: tmp,
-		Niz:      tmp}
+		Top:      new(StrText),
+		TopSplit: new(StrText),
+		Mid:      new(StrText),
+		SubSplit: new(StrText),
+		Sub:      new(StrText)}
 
-	var tt IText
-	tt = &nn
-	var ts IText
-	ts = &tmp
-	ts.SetSplit("", "")
+	var tt IText = &nn
+
+	//tt = &nn
+	tt.Split("", "")
 	tt.Set("Верх", "Низ", "Текст посередке")
-	tt.AddTopUD("Заголовки", "подзаголовки")
-	tt.AddBottomUD("нижние строки страницы", "последние строчечки")
-	tt.AddDU("текст1 порядок чтения снизу вверх")
-	tt.AddDU("текст2 для логов, блогов")
-	tt.AddDU("текст3 и для устаревающей информации")
-	tt.AddUD("txt1 для чтения сверху вниз")
-	tt.AddUD("txt2 для чтения по порядку")
-	tt.AddUD("txt3 как в книгах")
-	tt.SetSplit("~~Строка разделителя верхних заголовков и текста~~", "~~Строка разделителя текста и нижних строк страницы ~~")
+	tt.TopAddFall("Заголовки", "подзаголовки")
+	tt.SubAddFall("нижние строки страницы", "последние строчечки")
+	tt.AddRise("текст1 порядок чтения снизу вверх")
+	tt.AddRise("текст2 для логов, блогов")
+	tt.AddRise("текст3 и для устаревающей информации")
+	tt.AddFall("txt1 для чтения сверху вниз")
+	tt.AddFall("txt2 для чтения по порядку")
+	tt.AddFall("txt3 как в книгах")
+	tt.Split("~~Строка разделителя верхнего заголовка~~", "~~Строка разделителя нижнего заголовка страницы ~~")
 	fmt.Printf(string(tt.Get())) // Для вывода итогового текста в консоль
+
 	return
 }
