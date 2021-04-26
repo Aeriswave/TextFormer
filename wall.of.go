@@ -1,9 +1,8 @@
 package main
 
-type TextString string
-type TextBlock []TextString
-
-type TextTemplate struct {
+type StrText string
+type StrArray []StrText
+type StrBlock struct {
 	Top      IText
 	TopSplit IText
 	Mid      []IText
