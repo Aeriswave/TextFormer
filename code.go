@@ -1,5 +1,40 @@
 package main
 
+func (self *TextItem) NewText(text ...string) IText {
+	t := ""
+	for _, v := range text {
+		t = t + v + "\n"
+	}
+	self.text = TextString(t)
+	return nil
+}
+
+func (self *TextBlock) NewText(txt ...string) IText {
+	self.Clean()
+	if len(txt) > 0 {
+		var tt TextItem = TextItem{
+			text: TextString(txt[0])}
+		var ttt []IText = make([]IText, len(txt)-1)
+		for i, v := range txt {
+			if i > 0 {
+				ttt[i-1] = &TextItem{
+					text: TextString(v),
+				}
+				//fmt.Printf("xx %s xx\n", tt.GetText())
+			}
+		}
+		self.SetText(&tt, ttt...)
+	}
+	return self
+}
+
+func (self *TextModule) NewText(text ...string) IText {
+	var b TextBlock = TextBlock{}
+	b.NewText(text[0])
+	self.text = &b
+	return self
+}
+
 func (self *TextItem) Clean() {
 	self.text = ""
 }
@@ -144,7 +179,12 @@ func (self *TextModule) checkChild(child IText, i int) bool {
 	return false
 }
 
+func (self *TextItem) init() {
+
+}
+
 func (self *TextItem) SetText(m IText, s ...IText) IText {
+	self.init()
 	var t TextString = ""
 	if m != nil {
 		t = m.GetText()
@@ -161,6 +201,11 @@ func (self *TextItem) SetText(m IText, s ...IText) IText {
 }
 
 func (self *TextItem) GetText() TextString {
+	if len(self.text) > 0 {
+		if self.text[len(self.text)-1] != '\n' {
+			self.text = self.text + "\n"
+		}
+	}
 	return self.text
 }
 
@@ -199,17 +244,35 @@ func (self *TextBlock) Clean() {
 	}
 }
 
-func (self *TextBlock) SetText(m IText, s ...IText) IText {
-	// заменить текст в середине блока
-	if m != nil {
-		self.text.SetText(m)
+func (self *TextModule) init() {
+	if self.text == nil {
+		self.text = &TextItem{}
 	}
+}
+
+func (self *TextBlock) init() {
+	if self.text == nil {
+		self.text = &TextItem{}
+	}
+	if self.top == nil {
+		self.top = &TextItem{}
+	}
+	if self.sub == nil {
+		self.sub = &TextItem{}
+	}
+	if self.topSplit == nil {
+		self.topSplit = &TextItem{}
+	}
+	if self.subSplit == nil {
+		self.subSplit = &TextItem{}
+	}
+}
+
+func (self *TextBlock) SetText(m IText, s ...IText) IText {
+	self.init()
 	if len(s) > 0 {
 		var tt TextItem = TextItem{}
 		tt.text = ""
-		if self.text != nil {
-			tt.text += self.text.GetText()
-		}
 		for i, v := range s {
 			if v != nil {
 				switch i {
@@ -226,13 +289,34 @@ func (self *TextBlock) SetText(m IText, s ...IText) IText {
 				}
 			}
 		}
-		self.text.SetText(self, &tt)
+		self.text.SetText(m, &tt)
+	} else {
+		// заменить текст в середине блока
+		if m != nil {
+			self.text.SetText(m)
+		}
 	}
 	return self
 }
 
 func (self *TextBlock) GetText() TextString {
-	return self.top.GetText() + self.topSplit.GetText() + self.text.GetText() + self.subSplit.GetText() + self.sub.GetText()
+	var tt TextString = ""
+	if self.top != nil {
+		tt += self.top.GetText()
+	}
+	if self.topSplit != nil {
+		tt += self.topSplit.GetText()
+	}
+	if self.text != nil {
+		tt += self.text.GetText()
+	}
+	if self.subSplit != nil {
+		tt += self.subSplit.GetText()
+	}
+	if self.sub != nil {
+		tt += self.sub.GetText()
+	}
+	return tt
 }
 
 func (self *TextModule) Clean() {
@@ -259,6 +343,7 @@ func (self *TextModule) ReCreate() TextModule {
 }
 
 func (self *TextModule) SetText(m IText, s ...IText) IText {
+	self.init()
 	self.text.SetText(m, s...)
 	return self
 }
@@ -289,12 +374,10 @@ func (self *TextModule) GetFullText() TextString {
 
 // Добавить нисходящий текст
 func (self *TextBlock) AddFall(s ...IText) IText {
+	self.init()
 	if len(s) > 0 {
 		var tt TextItem = TextItem{}
 		tt.text = ""
-		if self.text != nil {
-			tt.text += self.text.GetText()
-		}
 		for i, v := range s {
 			if v != nil {
 				switch i {
@@ -311,12 +394,16 @@ func (self *TextBlock) AddFall(s ...IText) IText {
 				}
 			}
 		}
+		if self.text != nil {
+			tt.text += self.text.GetText()
+		}
 		self.text.SetText(&tt)
 	}
 	return self
 }
 
 func (self *TextModule) AddFall(s ...IText) IText {
+	self.init()
 	switch len(s) {
 	case 0:
 	default:
@@ -356,6 +443,7 @@ func (self *TextModule) AddFall(s ...IText) IText {
 }
 
 func (self *TextModule) AddRise(s ...IText) IText {
+	self.init()
 	switch len(s) {
 	case 0:
 	default:
@@ -408,6 +496,7 @@ func (self *TextModule) GetType() string {
 
 // Добавить восходящий текст
 func (self *TextBlock) AddRise(s ...IText) IText {
+	self.init()
 	if len(s) > 0 {
 		var tt TextItem = TextItem{}
 		tt.text = ""

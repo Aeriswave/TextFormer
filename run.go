@@ -5,33 +5,35 @@ import (
 )
 
 func main() {
+	//	несколько строчек
+	var q1 TextItem = TextItem{text: "txt1 для чтения сверху вниз"}
+	var q2 TextItem = TextItem{text: "txt2 написано для чтения сверху вниз"}
+	var q3 TextItem = TextItem{text: "txt3 как в книгах"}
+	q11 := []TextItem{
+		{text: "текст1 порядок написания снизу вверх"},
+		{text: "текст2 для логов, блогов"},
+		{text: "текст3 и для устаревающей информации"},
+	}
 
-	// Текстовый блок
-	var nn StrBlock = StrBlock{
-		Top:      new(StrText),
-		TopSplit: new(StrText),
-		Mid:      new(StrBlock),
-		SubSplit: new(StrText),
-		Sub:      new(StrModule)}
+	var qq TextBlock = TextBlock{}
+	qq.init()
+	qq.top.NewText("верх")
+	qq.text.NewText("середина")
+	qq.sub.NewText("низ")
+	qq.topSplit.NewText("+++верхний разделитель+++")
+	qq.subSplit.NewText("---нижний разделитель---")
+	qq.AddFall(nil, nil, nil, nil, &q1, &q2, &q3)
+	var w IText = qq.AddRise(nil, nil, nil, nil, &q11[0], &q11[1], &q11[2])
+	w.NewText("1111", "3", "4", "2222")
 
-	// API для работы с тектовым блоком
-	var tt IText = &nn
+	fmt.Printf(string(w.GetFullText())) // Для вывода итогового текста в консоль}
+	w.Clean()
+	fmt.Printf("--\n") // Для вывода итогового текста в консоль}
 
-	tt.Split("", "")
-	tt.Set(tt, -1, "Верх", "Низ", "Текст посередке")
-	tt.TopAddFall("Заголовки", "подзаголовки")
-	tt.SubAddFall("нижние строки страницы", "последние строчечки")
-	tt.AddRise(nil, "текст1 порядок чтения снизу вверх")
-	tt.AddRise(nil, "текст2 для логов, блогов")
-	tt.AddRise(nil, "текст3 и для устаревающей информации")
-	tt.AddFall(nil, "txt1 для чтения сверху вниз")
-	tt.AddFall(nil, "txt2 для чтения по порядку")
-	tt.AddFall(nil, "txt3 как в книгах")
-	tt.Split("~~Строка разделителя верхнего заголовка~~", "~~Строка разделителя нижнего заголовка страницы ~~")
-	fmt.Printf(string(tt.GetText()))           // Для вывода итогового текста в консоль
-	fmt.Printf("Для завершения нажмите Enter") // Для вывода итогового текста в консоль
-	esc := ""
-	fmt.Scanf("%s", &esc)
-	fmt.Printf("\nПока!\n") // Для вывода итогового текста в консоль
-	return
+	var ee TextModule = TextModule{}
+	ee.init()
+	w = ee.NewText("11111111111111")
+	fmt.Printf(string(w.GetFullText())) // Для вывода итогового текста в консоль}
+	w.Clean()
+	fmt.Printf("--\n" + string(w.GetFullText())) // Для вывода итогового текста в консоль}
 }

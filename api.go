@@ -2,30 +2,15 @@ package main
 
 type TextString string
 
+type TextAddress struct {
+	hash   Hash
+	parent IText
+	chain  IChain // Пока не реализовано
+}
+
 type TextItem struct {
 	address TextAddress
 	text    TextString
-}
-
-type IReader interface {
-	GetType() string
-	GetText() TextString
-}
-
-type IText interface {
-	SetParent(IText, Hash) bool
-	checkChild(IText, int) bool
-	getHash() Hash
-
-	SetText(IText, ...IText) IText
-	GetText() TextString
-	GetFullText() TextString
-	GetType() string
-
-	Clean()
-	Destroy() // уничтожить этот элемент текста
-	//Detonate() // уничтожить всю связанную цепочку элементов текста
-	delete(IText, Hash) bool
 }
 
 type TextBlock struct {
@@ -38,20 +23,6 @@ type TextBlock struct {
 	sub      IText
 }
 
-type TextAddress struct {
-	hash     Hash
-	nextHash int
-	prevHash int
-	parent   IText
-	chain    IChain
-}
-
-type Hash struct {
-	prev int
-	this int
-	next int
-}
-
 type TextModule struct {
 	address TextAddress
 	text    IText
@@ -62,13 +33,44 @@ type TextModule struct {
 	minFall IText
 }
 
-type TextChain struct {
+type IUser interface {
+	NewText(...string) IText
+	GetText() TextString
+	GetFullText() TextString
+}
+
+type IText interface {
+	NewText(...string) IText
+
+	SetParent(IText, Hash) bool
+	checkChild(IText, int) bool
+
+	SetText(IText, ...IText) IText
+	GetText() TextString
+	GetFullText() TextString
+	GetType() string
+
+	Clean()
+	Destroy() // уничтожить этот элемент текста
+	//Detonate() // уничтожить всю связанную цепочку элементов текста
+
+	getHash() Hash
+	delete(IText, Hash) bool
+}
+
+type Hash struct {
+	prev int
+	this int
+	next int
+}
+
+type TextChain struct { // Пока не реализовано
 	prev IText
 	this IText
 	next IText
 }
 
-type IChain interface {
+type IChain interface { // Пока не реализовано
 	Insert(TextModule)
 	Split() []TextChain
 	// 	InCapsulate // в блок, в модуль или в цепочку
