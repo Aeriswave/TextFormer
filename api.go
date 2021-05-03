@@ -3,11 +3,8 @@ package main
 type TextString string
 
 type TextItem struct {
-	index  int
-	parent IText
-	chain  IText
-
-	text TextString
+	address TextAddress
+	text    TextString
 }
 
 type IReader interface {
@@ -30,10 +27,7 @@ type IText interface {
 }
 
 type TextBlock struct {
-	index  int
-	parent IText
-	chain  IText
-
+	address  TextAddress
 	top      IText
 	topSplit IText
 	mid      IText
@@ -52,17 +46,20 @@ type TextBlock struct {
 //	Clean()
 //}
 
-type TextModule struct {
+type TextAddress struct {
 	index  int
 	parent IText
+	chain  IChain
+}
 
+type TextModule struct {
+	address   TextAddress
 	subRise   map[int]IText
 	subCenter int
 	//	addRise
-	//	newSubCenter = +maxIndex
-	maxIndex  int
-	subMiddle IText
-	//	newSubCenter = -maxIndex
+	//	newSubCenter >0
+	maxIndex int // центральная ячейка массива
+	//	newSubCenter <0
 	//	addFall
 	subFall map[int]IText
 
@@ -75,11 +72,10 @@ type TextChain struct {
 	next IText
 }
 
-type ITextChain interface {
+type IChain interface {
 	Insert(TextModule)
 	Split() []TextChain
 	// 	InCapsulate // в блок, в модуль или в цепочку
 	// 	ReCapsulate // в текст, в блок, в модуль или в цепочку
-
 	Detonate()
 }

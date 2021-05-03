@@ -6,25 +6,25 @@ func (self *TextItem) Clean() {
 
 func (self *TextItem) Destroy() {
 	self.Clean()
-	self.parent.delete(self, self.index)
-	self.parent = nil
-	self.index = 0
+	self.address.parent.delete(self, self.address.index)
+	self.address.parent = nil
+	self.address.index = 0
 	return
 }
 
 func (self *TextBlock) Destroy() {
 	self.Clean()
-	self.parent.delete(self, self.index)
-	self.parent = nil
-	self.index = 0
+	self.address.parent.delete(self, self.address.index)
+	self.address.parent = nil
+	self.address.index = 0
 	return
 }
 
 func (self *TextModule) Destroy() {
 	self.Clean()
-	self.parent.delete(self, self.index)
-	self.parent = nil
-	self.index = 0
+	self.address.parent.delete(self, self.address.index)
+	self.address.parent = nil
+	self.address.index = 0
 	return
 }
 
@@ -63,11 +63,6 @@ func (self *TextModule) delete(child IText, i int) bool {
 		} else if i < 0 {
 			delete(self.subRise, -i-1)
 			return true
-		} else {
-			if self.subMiddle != nil {
-				self.subMiddle = nil
-				return true
-			}
 		}
 	}
 	return false
@@ -75,8 +70,8 @@ func (self *TextModule) delete(child IText, i int) bool {
 
 func (self *TextItem) SetParent(parent IText, i int) bool {
 	if parent.checkChild(self, i) {
-		self.parent = parent
-		self.index = i
+		self.address.parent = parent
+		self.address.index = i
 		return true
 	}
 	return false
@@ -121,10 +116,6 @@ func (self *TextModule) checkChild(child IText, i int) bool {
 		if self.subFall[-i-1] == child {
 			return true
 		}
-	} else {
-		if child == self.subMiddle {
-			return true
-		}
 	}
 
 	return false
@@ -151,14 +142,14 @@ func (self *TextItem) GetText() TextString {
 }
 
 func (self *TextBlock) SetParent(parent IText, i int) bool {
-	self.parent = parent
-	self.index = i
+	self.address.parent = parent
+	self.address.index = i
 	return false
 }
 
 func (self *TextModule) SetParent(parent IText, i int) bool {
-	self.parent = parent
-	self.index = i
+	self.address.parent = parent
+	self.address.index = i
 	return false
 }
 
@@ -229,7 +220,6 @@ func (self *TextModule) Clean() {
 func (self *TextModule) ReCreate() TextModule {
 	// переписать массивы модуля, удалив nil-значения из массивов
 	var m TextModule = TextModule{}
-	m.subMiddle = self.subMiddle
 	for _, v := range self.subFall {
 		if v != nil {
 			m.AddFall(v)
@@ -286,29 +276,16 @@ func (self *TextBlock) AddFall(s ...IText) IText {
 func (self *TextModule) AddFall(s ...IText) IText {
 	switch len(s) {
 	case 0:
-		if self.subMiddle != nil {
-			self.maxIndex++
-			self.subFall[-self.maxIndex] = self.subMiddle
-			self.subFall[-self.maxIndex].SetParent(self, -self.maxIndex)
-			self.subMiddle = nil
-		}
 	default:
-		var ii int = 0
 		for _, v := range s {
 			if v != nil {
-				ii++
-				self.maxIndex++
-				if ii == 1 {
-					self.subFall[-self.maxIndex] = self.subMiddle
-					self.subMiddle = v
-				} else {
-					self.subFall[-self.maxIndex] = v
+				if self.maxIndex > 0 {
+					self.maxIndex = -self.maxIndex
 				}
-				self.subRise[-self.maxIndex].SetParent(self, -self.maxIndex)
+				self.maxIndex--
+				self.subFall[self.maxIndex] = v
+				self.subRise[self.maxIndex].SetParent(self, self.maxIndex)
 			}
-		}
-		if ii == 0 {
-			self.AddRise()
 		}
 	}
 	return self
@@ -317,30 +294,16 @@ func (self *TextModule) AddFall(s ...IText) IText {
 func (self *TextModule) AddRise(s ...IText) IText {
 	switch len(s) {
 	case 0:
-		if self.subMiddle != nil {
-			self.maxIndex++
-			self.subRise[self.maxIndex] = self.subMiddle
-			self.subRise[self.maxIndex].SetParent(self, self.maxIndex)
-			self.subMiddle = nil
-		}
 	default:
-		var ii int = 0
 		for _, v := range s {
 			if v != nil {
-				ii++
-				self.maxIndex++
-				if ii == 1 {
-					self.subRise[self.maxIndex] = self.subMiddle
-					self.subMiddle = v
-
-				} else {
-					self.subFall[self.maxIndex] = v
+				if self.maxIndex < 0 {
+					self.maxIndex = -self.maxIndex
 				}
+				self.maxIndex++
+				self.subRise[self.maxIndex] = v
 				self.subRise[self.maxIndex].SetParent(self, self.maxIndex)
 			}
-		}
-		if ii == 0 {
-			self.AddRise()
 		}
 	}
 	return self
