@@ -19,6 +19,7 @@ type IText interface {
 
 	SetText(IText, ...IText) IText
 	GetText() TextString
+	GetFullText() TextString
 	GetType() string
 
 	Clean()

@@ -267,9 +267,24 @@ func (self *TextModule) GetText() TextString {
 	return self.text.GetText()
 }
 
-func (self *TextModule) GetFullText() TextString {
+func (self *TextItem) GetFullText() TextString {
+	return self.GetText()
+}
 
-	return self.text.GetText()
+func (self *TextBlock) GetFullText() TextString {
+	return self.GetText()
+}
+
+func (self *TextModule) GetFullText() TextString {
+	var txt TextString = ""
+	txt = self.text.GetFullText()
+	for _, v := range self.subFall {
+		txt += v.GetFullText()
+	}
+	for _, v := range self.subRise {
+		txt += v.GetFullText()
+	}
+	return self.text.GetFullText()
 }
 
 // Добавить нисходящий текст
