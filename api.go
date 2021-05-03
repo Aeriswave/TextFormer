@@ -13,8 +13,9 @@ type IReader interface {
 }
 
 type IText interface {
-	SetParent(IText, int) bool
+	SetParent(IText, Hash) bool
 	checkChild(IText, int) bool
+	getHash() Hash
 
 	SetText(IText, ...IText) IText
 	GetText() TextString
@@ -23,52 +24,46 @@ type IText interface {
 	Clean()
 	Destroy() // уничтожить этот элемент текста
 	//Detonate() // уничтожить всю связанную цепочку элементов текста
-	delete(IText, int) bool
+	delete(IText, Hash) bool
 }
 
 type TextBlock struct {
-	address  TextAddress
+	address TextAddress
+	text    IText
+
 	top      IText
 	topSplit IText
-	mid      IText
 	subSplit IText
 	sub      IText
 }
 
-//type ITextBlock interface {
-//	SetText(IText, ...IText) IText // Перезаписать текст этого блока/
-//	GetText() TextString           // Получить текст этого блока//
-//	GetType() string
-//
-//	AddFall(...IText) IText // для чтения сверху вниз
-//	AddRise(...IText) IText // чтения снизу вверх
-//
-//	Clean()
-//}
-
 type TextAddress struct {
-	index  int
-	parent IText
-	chain  IChain
+	hash     Hash
+	nextHash int
+	prevHash int
+	parent   IText
+	chain    IChain
+}
+
+type Hash struct {
+	prev int
+	this int
+	next int
 }
 
 type TextModule struct {
-	address   TextAddress
-	subRise   map[int]IText
-	subCenter int
-	//	addRise
-	//	newSubCenter >0
-	maxIndex int // центральная ячейка массива
-	//	newSubCenter <0
-	//	addFall
-	subFall map[int]IText
+	address TextAddress
+	text    IText
 
-	text IText
+	subRise map[int]IText
+	maxRise IText
+	subFall map[int]IText
+	minFall IText
 }
 
 type TextChain struct {
 	prev IText
-	this TextModule
+	this IText
 	next IText
 }
 

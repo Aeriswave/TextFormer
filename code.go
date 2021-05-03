@@ -6,35 +6,35 @@ func (self *TextItem) Clean() {
 
 func (self *TextItem) Destroy() {
 	self.Clean()
-	self.address.parent.delete(self, self.address.index)
+	self.address.parent.delete(self, self.address.hash)
 	self.address.parent = nil
-	self.address.index = 0
+	self.address.hash = Hash{this: 0, next: 0, prev: 0}
 	return
 }
 
 func (self *TextBlock) Destroy() {
 	self.Clean()
-	self.address.parent.delete(self, self.address.index)
+	self.address.parent.delete(self, self.address.hash)
 	self.address.parent = nil
-	self.address.index = 0
+	self.address.hash = Hash{this: 0, next: 0, prev: 0}
 	return
 }
 
 func (self *TextModule) Destroy() {
 	self.Clean()
-	self.address.parent.delete(self, self.address.index)
+	self.address.parent.delete(self, self.address.hash)
 	self.address.parent = nil
-	self.address.index = 0
+	self.address.hash = Hash{this: 0, next: 0, prev: 0}
 	return
 }
 
-func (self *TextItem) delete(child IText, i int) bool {
+func (self *TextItem) delete(child IText, i Hash) bool {
 	return false
 }
 
-func (self *TextBlock) delete(child IText, i int) bool {
-	if self.checkChild(child, i) {
-		switch i {
+func (self *TextBlock) delete(child IText, i Hash) bool {
+	if self.checkChild(child, i.this) {
+		switch i.this {
 		case -2:
 			self.sub = nil
 			return true
@@ -42,7 +42,7 @@ func (self *TextBlock) delete(child IText, i int) bool {
 			self.subSplit = nil
 			return true
 		case 0:
-			self.mid = nil
+			self.text = nil
 			return true
 		case 1:
 			self.topSplit = nil
@@ -55,23 +55,46 @@ func (self *TextBlock) delete(child IText, i int) bool {
 	return false
 }
 
-func (self *TextModule) delete(child IText, i int) bool {
-	if self.checkChild(child, i) {
-		if i > 0 {
-			delete(self.subRise, i-1)
+func (self *TextModule) delete(child IText, i Hash) bool {
+	if self.checkChild(child, i.this) {
+		if i.this > 0 {
+			if self.maxRise.getHash().this == i.this {
+				self.maxRise = self.subRise[i.prev]
+				self.subRise[i.prev].SetParent(self, Hash{
+					next: i.this,
+					this: self.subRise[i.prev].getHash().this,
+					prev: self.subRise[i.prev].getHash().prev})
+			} else {
+				self.subRise[i.prev].SetParent(self, Hash{
+					next: i.next,
+					this: self.subRise[i.prev].getHash().this,
+					prev: self.subRise[i.prev].getHash().prev})
+				self.subRise[i.next].SetParent(self, Hash{
+					prev: i.prev,
+					this: self.subRise[i.next].getHash().this,
+					next: self.subRise[i.next].getHash().prev})
+			}
+			delete(self.subRise, i.this)
 			return true
-		} else if i < 0 {
-			delete(self.subRise, -i-1)
+		} else if i.this < 0 {
+			if self.minFall.getHash().this == i.this {
+				self.minFall = self.subFall[i.prev]
+				self.subFall[i.prev].SetParent(self, Hash{next: i.this, this: self.subFall[i.prev].getHash().this, prev: self.subRise[i.prev].getHash().prev})
+			} else {
+				self.subFall[i.prev].SetParent(self, Hash{next: i.next, this: self.subFall[i.prev].getHash().this, prev: self.subRise[i.prev].getHash().prev})
+				self.subFall[i.next].SetParent(self, Hash{prev: i.prev, this: self.subFall[i.next].getHash().this, next: self.subRise[i.next].getHash().prev})
+			}
+			delete(self.subFall, i.this)
 			return true
 		}
 	}
 	return false
 }
 
-func (self *TextItem) SetParent(parent IText, i int) bool {
-	if parent.checkChild(self, i) {
+func (self *TextItem) SetParent(parent IText, i Hash) bool {
+	if parent.checkChild(self, i.this) {
 		self.address.parent = parent
-		self.address.index = i
+		self.address.hash = i
 		return true
 	}
 	return false
@@ -92,7 +115,7 @@ func (self *TextBlock) checkChild(child IText, i int) bool {
 			return true
 		}
 	case 0:
-		if self.mid == child {
+		if self.text == child {
 			return true
 		}
 	case 1:
@@ -141,22 +164,22 @@ func (self *TextItem) GetText() TextString {
 	return self.text
 }
 
-func (self *TextBlock) SetParent(parent IText, i int) bool {
+func (self *TextBlock) SetParent(parent IText, i Hash) bool {
 	self.address.parent = parent
-	self.address.index = i
+	self.address.hash = i
 	return false
 }
 
-func (self *TextModule) SetParent(parent IText, i int) bool {
+func (self *TextModule) SetParent(parent IText, hash Hash) bool {
 	self.address.parent = parent
-	self.address.index = i
+	self.address.hash = hash
 	return false
 }
 
 func (self *TextBlock) Clean() {
-	if self.mid != nil {
-		self.mid.Clean()
-		self.mid = nil
+	if self.text != nil {
+		self.text.Clean()
+		self.text = nil
 	}
 	if self.top != nil {
 		self.top.Clean()
@@ -179,13 +202,13 @@ func (self *TextBlock) Clean() {
 func (self *TextBlock) SetText(m IText, s ...IText) IText {
 	// заменить текст в середине блока
 	if m != nil {
-		self.mid.SetText(m)
+		self.text.SetText(m)
 	}
 	if len(s) > 0 {
 		var tt TextItem = TextItem{}
 		tt.text = ""
-		if self.mid != nil {
-			tt.text += self.mid.GetText()
+		if self.text != nil {
+			tt.text += self.text.GetText()
 		}
 		for i, v := range s {
 			if v != nil {
@@ -203,13 +226,13 @@ func (self *TextBlock) SetText(m IText, s ...IText) IText {
 				}
 			}
 		}
-		self.mid.SetText(self, &tt)
+		self.text.SetText(self, &tt)
 	}
 	return self
 }
 
 func (self *TextBlock) GetText() TextString {
-	return self.top.GetText() + self.topSplit.GetText() + self.mid.GetText() + self.subSplit.GetText() + self.sub.GetText()
+	return self.top.GetText() + self.topSplit.GetText() + self.text.GetText() + self.subSplit.GetText() + self.sub.GetText()
 }
 
 func (self *TextModule) Clean() {
@@ -244,13 +267,18 @@ func (self *TextModule) GetText() TextString {
 	return self.text.GetText()
 }
 
+func (self *TextModule) GetFullText() TextString {
+
+	return self.text.GetText()
+}
+
 // Добавить нисходящий текст
 func (self *TextBlock) AddFall(s ...IText) IText {
 	if len(s) > 0 {
 		var tt TextItem = TextItem{}
 		tt.text = ""
-		if self.mid != nil {
-			tt.text += self.mid.GetText()
+		if self.text != nil {
+			tt.text += self.text.GetText()
 		}
 		for i, v := range s {
 			if v != nil {
@@ -268,7 +296,7 @@ func (self *TextBlock) AddFall(s ...IText) IText {
 				}
 			}
 		}
-		self.mid.SetText(&tt)
+		self.text.SetText(&tt)
 	}
 	return self
 }
@@ -279,12 +307,33 @@ func (self *TextModule) AddFall(s ...IText) IText {
 	default:
 		for _, v := range s {
 			if v != nil {
-				if self.maxIndex > 0 {
-					self.maxIndex = -self.maxIndex
+				var index int = 0
+				if self.minFall != nil {
+					index = self.minFall.getHash().this
+					self.subFall[0] = v
+					self.subFall[0].SetParent(self,
+						Hash{
+							prev: 0,
+							this: 0,
+							next: 0,
+						})
+					self.minFall = self.subFall[0]
+				} else {
+					self.subFall[index-1] = v
+					self.subFall[index-1].SetParent(self,
+						Hash{
+							prev: self.minFall.getHash().this,
+							this: index - 1,
+							next: index - 1,
+						})
+					self.minFall.SetParent(self,
+						Hash{
+							prev: self.minFall.getHash().prev,
+							this: self.minFall.getHash().this,
+							next: index - 1,
+						})
+					self.minFall = self.subFall[index-1]
 				}
-				self.maxIndex--
-				self.subFall[self.maxIndex] = v
-				self.subRise[self.maxIndex].SetParent(self, self.maxIndex)
 			}
 		}
 	}
@@ -297,12 +346,33 @@ func (self *TextModule) AddRise(s ...IText) IText {
 	default:
 		for _, v := range s {
 			if v != nil {
-				if self.maxIndex < 0 {
-					self.maxIndex = -self.maxIndex
+				var index int = 0
+				if self.maxRise != nil {
+					index = self.maxRise.getHash().this
+					self.subRise[0] = v
+					self.subRise[0].SetParent(self,
+						Hash{
+							prev: 0,
+							this: 0,
+							next: 0,
+						})
+					self.maxRise = self.subRise[0]
+				} else {
+					self.subRise[index+1] = v
+					self.subRise[index+1].SetParent(self,
+						Hash{
+							prev: self.maxRise.getHash().this,
+							this: index + 1,
+							next: index + 1,
+						})
+					self.maxRise.SetParent(self,
+						Hash{
+							prev: self.maxRise.getHash().prev,
+							this: self.maxRise.getHash().this,
+							next: index + 1,
+						})
+					self.maxRise = self.subRise[index+1]
 				}
-				self.maxIndex++
-				self.subRise[self.maxIndex] = v
-				self.subRise[self.maxIndex].SetParent(self, self.maxIndex)
 			}
 		}
 	}
@@ -331,10 +401,22 @@ func (self *TextBlock) AddRise(s ...IText) IText {
 				tt.text = v.GetText() + tt.text
 			}
 		}
-		if self.mid != nil {
-			tt.text = self.mid.GetText() + tt.text
+		if self.text != nil {
+			tt.text = self.text.GetText() + tt.text
 		}
-		self.mid.SetText(&tt)
+		self.text.SetText(&tt)
 	}
 	return self
+}
+
+func (self *TextItem) getHash() Hash {
+	return self.address.hash
+}
+
+func (self *TextBlock) getHash() Hash {
+	return self.address.hash
+}
+
+func (self *TextModule) getHash() Hash {
+	return self.address.hash
 }
