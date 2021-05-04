@@ -24,7 +24,7 @@ func main() {
 	qq.subSplit.NewText("---нижний разделитель---")
 	qq.AddFall(nil, nil, nil, nil, &q1, &q2, &q3)
 	var w IText = qq.AddRise(nil, nil, nil, nil, &q11[0], &q11[1], &q11[2])
-	w.NewText("1111", "3", "4", "2222")
+	//	w.NewText("1111", "3", "4", "2222")
 
 	fmt.Printf(string(w.GetFullText())) // Для вывода итогового текста в консоль}
 	w.Clean()
@@ -32,8 +32,8 @@ func main() {
 
 	var ee TextModule = TextModule{}
 	ee.init()
-	w = ee.NewText("11111111111111")
+	w = ee.NewText("11111111111111", "2222222", "333333", "44444")
 	fmt.Printf(string(w.GetFullText())) // Для вывода итогового текста в консоль}
 	w.Clean()
-	fmt.Printf("--\n" + string(w.GetFullText())) // Для вывода итогового текста в консоль}
+	//	fmt.Printf("--\n" + string(w.GetFullText())) // Для вывода итогового текста в консоль}
 }

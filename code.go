@@ -29,9 +29,13 @@ func (self *TextBlock) NewText(txt ...string) IText {
 }
 
 func (self *TextModule) NewText(text ...string) IText {
-	var b TextBlock = TextBlock{}
-	b.NewText(text[0])
-	self.text = &b
+	var b []TextBlock = make([]TextBlock, len(text))
+	var ib []IText = make([]IText, len(text))
+	for i, v := range text {
+		b[i].NewText(v)
+		ib[i] = &b[i]
+	}
+	self.AddRise(ib...)
 	return self
 }
 
@@ -369,7 +373,7 @@ func (self *TextModule) GetFullText() TextString {
 	for _, v := range self.subRise {
 		txt += v.GetFullText()
 	}
-	return self.text.GetFullText()
+	return txt
 }
 
 // Добавить нисходящий текст
@@ -404,38 +408,38 @@ func (self *TextBlock) AddFall(s ...IText) IText {
 
 func (self *TextModule) AddFall(s ...IText) IText {
 	self.init()
-	switch len(s) {
+	var l int = len(s)
+	switch l {
 	case 0:
 	default:
-		for _, v := range s {
+		var index int = 0
+		for i, v := range s {
 			if v != nil {
-				var index int = 0
 				if self.minFall != nil {
 					index = self.minFall.getHash().this
-					self.subFall[0] = v
-					self.subFall[0].SetParent(self,
-						Hash{
-							prev: 0,
-							this: 0,
-							next: 0,
-						})
-					self.minFall = self.subFall[0]
 				} else {
-					self.subFall[index-1] = v
-					self.subFall[index-1].SetParent(self,
-						Hash{
-							prev: self.minFall.getHash().this,
-							this: index - 1,
-							next: index - 1,
-						})
-					self.minFall.SetParent(self,
-						Hash{
-							prev: self.minFall.getHash().prev,
-							this: self.minFall.getHash().this,
-							next: index - 1,
-						})
-					self.minFall = self.subFall[index-1]
+					self.subFall = make(map[int]IText, len(s))
+					self.minFall = IText(s[i])
+					self.minFall.SetParent(
+						self,
+						Hash{this: 0, next: 0, prev: 0},
+					)
 				}
+				self.subFall[index-1] = s[l-i-1]
+				self.subFall[index-1].SetParent(self,
+					Hash{
+						prev: self.minFall.getHash().this,
+						this: index - 1,
+						next: index - 1,
+					})
+				self.minFall.SetParent(self,
+					Hash{
+						prev: self.minFall.getHash().prev,
+						this: self.minFall.getHash().this,
+						next: index - 1,
+					})
+				self.minFall = self.subFall[index-1]
+
 			}
 		}
 	}
@@ -444,38 +448,37 @@ func (self *TextModule) AddFall(s ...IText) IText {
 
 func (self *TextModule) AddRise(s ...IText) IText {
 	self.init()
-	switch len(s) {
+	var l int = len(s)
+	switch l {
 	case 0:
 	default:
-		for _, v := range s {
+		var index int = 0
+		for i, v := range s {
 			if v != nil {
-				var index int = 0
 				if self.maxRise != nil {
 					index = self.maxRise.getHash().this
-					self.subRise[0] = v
-					self.subRise[0].SetParent(self,
-						Hash{
-							prev: 0,
-							this: 0,
-							next: 0,
-						})
-					self.maxRise = self.subRise[0]
 				} else {
-					self.subRise[index+1] = v
-					self.subRise[index+1].SetParent(self,
-						Hash{
-							prev: self.maxRise.getHash().this,
-							this: index + 1,
-							next: index + 1,
-						})
-					self.maxRise.SetParent(self,
-						Hash{
-							prev: self.maxRise.getHash().prev,
-							this: self.maxRise.getHash().this,
-							next: index + 1,
-						})
-					self.maxRise = self.subRise[index+1]
+					self.subRise = make(map[int]IText, len(s))
+					self.maxRise = IText(s[i])
+					self.maxRise.SetParent(
+						self,
+						Hash{this: 0, next: 0, prev: 0},
+					)
 				}
+				self.subRise[index+1] = s[i]
+				self.subRise[index+1].SetParent(self,
+					Hash{
+						prev: self.maxRise.getHash().this,
+						this: index + 1,
+						next: index + 1,
+					})
+				self.maxRise.SetParent(self,
+					Hash{
+						prev: self.maxRise.getHash().prev,
+						this: self.maxRise.getHash().this,
+						next: index + 1,
+					})
+				self.maxRise = self.subRise[index+1]
 			}
 		}
 	}
