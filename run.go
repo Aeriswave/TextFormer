@@ -2,38 +2,80 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"time"
 )
 
+//	"fmt"
+
 func main() {
-	//	несколько строчек
-	var q1 TextItem = TextItem{text: "txt1 для чтения сверху вниз"}
-	var q2 TextItem = TextItem{text: "txt2 написано для чтения сверху вниз"}
-	var q3 TextItem = TextItem{text: "txt3 как в книгах"}
-	q11 := []TextItem{
-		{text: "текст1 порядок написания снизу вверх"},
-		{text: "текст2 для логов, блогов"},
-		{text: "текст3 и для устаревающей информации"},
+	var orco Mainer = "Самообучение"
+	cwl := orco.Init(16) // запуск до 16 сопрограмм
+	fmt.Println("Запущена программа: " + orco)
+
+	icw, log := cwl.Create("LOG-Терминал")
+	synch := make(chan string) // канал для сообщений синхронизации
+	logch := make(chan string) // канал для вывода текста в терминал
+	tch1 := make(chan string)  // подканал 1 для вывода текста
+	log += "ds"
+	tch2 := make(chan string) // подканал 2 для вывода текста
+	//	runtime.GOMAXPROCS(4)
+	go Sync(time.Millisecond*1000, synch, nil, nil, nil, logch) // запуск гофера с генератором синхроимпульсов
+	go ChannelMixer(synch, logch, tch1, tch2)                   // смешивание нескольких текстовых каналов в один
+	go Terminal(logch)
+	go aparser(tch1)
+
+	icw.Init()
+	//	fmt.Scanf("...")
+	//	fmt.Println("_+_+_+_")
+
+	var oo string = ""
+	time.Sleep(time.Second * 3)
+	tch2 <- "Введите любой текст: "
+	fmt.Fscan(os.Stdin, &oo)
+	tch2 <- "сообщение из основной программы = " + oo
+	tch2 <- "Выход\n"
+	fmt.Scanf("...")
+	fmt.Println("Программа остановлена")
+}
+
+// Запустить новый сопроцесс
+func (self CWList) Create(name string) (icw ICW, log string) {
+	self.index = (self.index + 1) % (self.coworks)
+	_, have := self.coworksList[name]
+	if have == false {
+		_, have := self.cowoIDsList[self.index]
+		if have == false {
+			self.coworksList[name] = CW(self.index)
+			self.cowoIDsList[self.index] = name
+			icw = self.coworksList[name]
+			return icw, "Новый процесс успешно создан\n"
+		} else {
+			return nil, "Ошибка: Невозможно создать процесс\n"
+		}
+	} else {
+		log = "Ошибка: Невозможно создать новый сопроцесс с таким именем, т.к. сопроцесс с именем '" + name + "' уже существует.\n"
+		return nil, log
 	}
+}
 
-	var qq TextBlock = TextBlock{}
-	qq.init()
-	qq.top.NewText("верх")
-	qq.text.NewText("середина")
-	qq.sub.NewText("низ")
-	qq.topSplit.NewText("+++верхний разделитель+++")
-	qq.subSplit.NewText("---нижний разделитель---")
-	qq.AddFall(nil, nil, nil, nil, &q1, &q2, &q3)
-	var w IText = qq.AddRise(nil, nil, nil, nil, &q11[0], &q11[1], &q11[2])
-	//	w.NewText("1111", "3", "4", "2222")
+// Остановить сопроцесс
+func (self CWList) Destroy(name string) (icw ICW, err string) {
+	return nil, err
+}
+func (self Mainer) Init(coworks uint) ICWList {
+	var cwl CWList = CWList{
+		index:       -1,
+		coworks:     int(1 + coworks),
+		cowoIDsList: make(map[int]string, coworks),
+		coworksList: make(map[string]CW, coworks)}
 
-	fmt.Printf(string(w.GetFullText())) // Для вывода итогового текста в консоль}
-	w.Clean()
-	fmt.Printf("--\n") // Для вывода итогового текста в консоль}
+	return cwl
+}
 
-	var ee TextModule = TextModule{}
-	ee.init()
-	w = ee.NewText("11111111111111", "2222222", "333333", "44444")
-	fmt.Printf(string(w.GetFullText())) // Для вывода итогового текста в консоль}
-	w.Clean()
-	//	fmt.Printf("--\n" + string(w.GetFullText())) // Для вывода итогового текста в консоль}
+func (self CW) Init() (iset ISetter, irun IRunner, idrive IDriver, log string) {
+	// iset.Off()
+	// irun.Wait()
+	//settings:=
+	return iset, irun, idrive, log
 }

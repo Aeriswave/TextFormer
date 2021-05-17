@@ -1,5 +1,9 @@
 package main
 
+import (
+	"fmt"
+)
+
 func (self *TextItem) NewText(text ...string) IText {
 	t := ""
 	for _, v := range text {
@@ -370,10 +374,35 @@ func (self *TextModule) GetFullText() TextString {
 	for _, v := range self.subFall {
 		txt += v.GetFullText()
 	}
-	for _, v := range self.subRise {
-		txt += v.GetFullText()
+
+	var riseTxt TextString = ""
+	if self.maxRise != nil {
+		var n int = self.maxRise.getHash().this
+		//		riseTxt = self.maxRise.GetText() + riseTxt
+		for iii := 0; iii >= 0; iii++ {
+			if self.subRise != nil {
+				if self.subRise[n] != nil {
+					riseTxt = self.subRise[n].GetText() + riseTxt
+					if n == self.subRise[n].getHash().prev {
+						iii = -100
+					} else {
+						n = self.subRise[n].getHash().prev
+					}
+				} else {
+					iii = -100
+					fmt.Printf("опять ошибка")
+				}
+			} else {
+				iii = -100
+				fmt.Printf("ошибка")
+			}
+		}
 	}
-	return txt
+	//	for _, v := range self.subRise {
+	//	n = self.subRise[n].getHash().prev
+	//	txt += self.subRise[n].GetText()
+	//	}
+	return txt + riseTxt
 }
 
 // Добавить нисходящий текст

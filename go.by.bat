@@ -4,7 +4,7 @@ title TextFormer
 echo Start
 pause
 :: в Windows CMD консоли Git можно запускать, перечислив все используемые файлы
-go run do.go run.go run.in.go run.of.go
+go run run.go antiparser.go code.go log.go api.go
 echo End
 pause
 ::exit

@@ -1,5 +1,41 @@
 package main
 
+type Mainer string
+
+type CW int
+type ICW interface {
+	Init() (iset ISetter, irun IRunner, idrive IDriver, log string)
+}
+
+type CWList struct {
+	index       int
+	coworks     int
+	cowoIDsList map[int]string
+	coworksList map[string]CW
+}
+type ICWList interface {
+	Create(name string) (icw ICW, err string)
+	Destroy(name string) (icw ICW, err string)
+}
+
+type ISetter interface {
+	On()
+	Off()
+	SetUp()
+}
+
+type IRunner interface {
+	Sync()
+	Step()
+	Wait()
+}
+
+type IDriver interface {
+	Get()
+	Put()
+	Use()
+}
+
 type TextString string
 
 type TextAddress struct {
@@ -21,6 +57,12 @@ type TextBlock struct {
 	topSplit IText
 	subSplit IText
 	sub      IText
+}
+
+type TextArray struct {
+	address TextAddress
+	text    IText
+	array   map[int]IText
 }
 
 type TextModule struct {
