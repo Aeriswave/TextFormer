@@ -398,10 +398,6 @@ func (self *TextModule) GetFullText() TextString {
 			}
 		}
 	}
-	//	for _, v := range self.subRise {
-	//	n = self.subRise[n].getHash().prev
-	//	txt += self.subRise[n].GetText()
-	//	}
 	return txt + riseTxt
 }
 

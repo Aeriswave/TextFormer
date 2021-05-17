@@ -16,8 +16,6 @@ func Sync(freq time.Duration, syncOUT chan<- string, syncIN <-chan string, contr
 	for {
 		select { // Оператор select для чтения данных из канала
 		case <-timeout: // Ждет окончания такта генератора
-			//			log <- "Sync: " + fmt.Sprint(time.Since(startTime)/freq)
-			//			fmt.Println("log: sync= ", time.Since(startTime)/freq)
 			syncOUT <- "Тик. " + "Раунд " + fmt.Sprint(time.Since(startTime)/freq)
 			lt = time.Since(localTiming)
 			localTiming = time.Now()
@@ -30,6 +28,9 @@ func Sync(freq time.Duration, syncOUT chan<- string, syncIN <-chan string, contr
 	}
 }
 
+// Смешивание текста из нескольких каналов в один общий
+// Смешивание выполняется раз в определенное время, строго после получения сопрограммой
+// сообщения в потоке синхронизации о начале нового раунда
 func ChannelMixer(sync <-chan string, a chan<- string, b ...<-chan string) {
 	a <- "Микшер текста запущен"
 	syncMSG := "базовое сообщение синхронизации"
@@ -37,7 +38,7 @@ func ChannelMixer(sync <-chan string, a chan<- string, b ...<-chan string) {
 	for {
 		select { // Оператор select для чтения данных из канала
 		case syncMSG = <-sync: // Ждет, когда проснется гофер синхронизации
-			//			if syncMSG == "Тик" {
+			//			if syncMSG == "Тик" { // обработка по типам сообщений
 			for i := range b {
 				go func(i int) {
 					msg = <-b[i]
@@ -48,11 +49,12 @@ func ChannelMixer(sync <-chan string, a chan<- string, b ...<-chan string) {
 	}
 }
 
-func Terminal(c <-chan string) {
+// Вывод текста из потока в консоль терминала
+func Terminal(chs CWCH) {
 	fmt.Println("Терминал запущен")
 	for {
 		select { // Оператор select для чтения данных из канала
-		case msg := <-c: // Ждет, когда проснется гофер
+		case msg := <-chs.data: // Ждет, когда проснется гофер
 			fmt.Println("Terminal: \n\t" + msg)
 		}
 	}

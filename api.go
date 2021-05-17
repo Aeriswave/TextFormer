@@ -3,8 +3,21 @@ package main
 type Mainer string
 
 type CW int
+
+type CWCH struct {
+	//	runIN   chan<- string // поток для приема сопрограммой сообщений синхронизации
+	//	runOUT  <-chan string // поток для отправки сообщений синхронизации
+	//	setIN   chan<- string // поток для управления этой сопрограммой
+	//	setOUT  <-chan string // поток для отправки управляющих сообщений другим сопрограммам
+	//	doIN    chan<- string // поток для получения команд для исполнения
+	//	doOUT   <-chan string // поток для отправки команд для исполнения другим сопрограммам
+	data chan string // поток для получения данных
+	//	dataOUT <-chan string // поток для отправки данных
+	logOUT <-chan string // поток для отправки сообщений в лог
+}
+
 type ICW interface {
-	Init() (iset ISetter, irun IRunner, idrive IDriver, log string)
+	Init(func(CWCH)) (chs CWCH, log string)
 }
 
 type CWList struct {
@@ -14,27 +27,23 @@ type CWList struct {
 	coworksList map[string]CW
 }
 type ICWList interface {
-	Create(name string) (icw ICW, err string)
+	Create(name string, f func(CWCH)) (icw CWCH, err string)
 	Destroy(name string) (icw ICW, err string)
 }
 
+/*
 type ISetter interface {
-	On()
-	Off()
-	SetUp()
 }
 
 type IRunner interface {
-	Sync()
-	Step()
-	Wait()
 }
 
 type IDriver interface {
-	Get()
-	Put()
-	Use()
 }
+
+type IKeeper interface {
+}
+*/
 
 type TextString string
 
